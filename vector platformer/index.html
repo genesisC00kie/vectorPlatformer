@@ -1,0 +1,297 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>jack smelliman</title>
+    <script src="phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+    var config = {
+    type: Phaser.AUTO,
+    width: 6720,
+    height: 1440,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: true
+        }
+    },
+
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+    var Text;
+    function preload ()
+    {//load the assets
+        this.load.image('background', 'assets/sky.png');
+        this.load.image('tiles', 'assets/skyTileset.png');
+        this.load.tilemapTiledJSON('sky', 'assets/skyTilemap.json');
+        this.load.spritesheet('player', 
+            'assets/player.png',
+            { frameWidth: 16, frameHeight: 16 }
+        );
+        this.load.spritesheet('P2','assets/P2.png',
+        {frameWidth: 32, frameHeight: 16});
+    };
+    
+    function create ()
+    {//create assets within the game
+        this.skyMap = this.make.tilemap({key: 'sky'});
+        this.tileset = this.skyMap.addTilesetImage('skytileset','tiles');
+        this.background = this.skyMap.createLayer('background', this.tileset,);           
+        this.shrooms = this.skyMap.createLayer('mushrooms', this.tileset,);
+        this.shrooms.setCollisionByExclusion([-1]);
+        this.background.setScale(3);
+        this.shrooms.setScale(3);
+
+
+        
+        Text = this.add.text(16, 16, 0, { fontSize: '32px', fill: '#000' });
+        upText = this.add.text(16, 40, 0, { fontSize: '32px', fill: '#000' });
+
+        
+        
+//add the player model and add physics
+        this.player = this.physics.add.sprite(200,200,"player");
+        this.player.setScale(3);
+        this.player.setCollideWorldBounds(true);
+        this.player.body.setGravityY(300)
+        this.P2 = this.physics.add.sprite(100,100,"P2");
+        this.P2.setScale(3);
+        this.P2.body.setAllowGravity(false);
+        this.P2.setCollideWorldBounds(true);
+        this.physics.add.collider(this.player, this.shrooms);
+        
+        
+// animations
+
+        //player animations
+ 
+
+        this.anims.create({
+            key: "left-idle",
+            frames: this.anims.generateFrameNumbers('player', { start: 1, end: 1 }),
+            frameRate: 0,
+            repeat: -1
+
+        })
+        this.anims.create({
+            key: "right-idle",
+            frames: this.anims.generateFrameNumbers('player', {start: 0, end: 0}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"left-walk",
+            frames: this.anims.generateFrameNumbers('player', {start: 6, end: 9}),
+            frameRate: 8,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"right-walk",
+            frames: this.anims.generateFrameNumbers('player', {start: 2, end: 5}),
+            frameRate: 8,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"right-jump",
+            frames: this.anims.generateFrameNumbers('player', {start: 10, end: 10}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"right-fall",
+            frames: this.anims.generateFrameNumbers('player', {start: 11, end: 11}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"left-jump",
+            frames: this.anims.generateFrameNumbers('player', {start: 12, end: 12}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"left-fall",
+            frames: this.anims.generateFrameNumbers('player', {start: 13, end: 13}),
+            frameRate: 0,
+            repeat: -1
+        })
+
+
+        //platform movement
+        this.anims.create({
+            key:"platform-idle",
+            frames: this.anims.generateFrameNumbers('P2', {start: 0, end: 0}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"platform-right",
+            frames: this.anims.generateFrameNumbers('P2', {start: 1, end: 1}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"platform-left",
+            frames: this.anims.generateFrameNumbers('P2', {start: 2, end: 2}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"platform-down",
+            frames: this.anims.generateFrameNumbers('P2', {start: 3, end: 3}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"platform-up",
+            frames: this.anims.generateFrameNumbers('P2', {start: 4, end: 4}),
+            frameRate: 0,
+            repeat: -1
+        })
+        this.anims.create({
+            key:"platform-idle",
+            frames: this.anims.generateFrameNumbers('P2', {start: 5, end: 5}),
+            frameRate: 0,
+            repeat: -1
+        })
+        /*player*/facingLeft = false;
+        /*player*/facingRight = false;
+        colliding = true;
+    };
+    
+    function update(){
+        Text.setPosition(this.player.x-50,this.player.y-50)
+        velocity=this.player.body.velocity.x;
+        Text.setText(velocity);
+        upVel = this.player.body.velocity.y;
+        upText.setText(upVel);
+        // arrow key input
+        cursors = this.input.keyboard.createCursorKeys();
+
+        // wasd input
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+        //player-platform collision
+        this.physics.add.collider(this.player,this.P2,collision, null,this);
+
+
+//player movement start
+        if (cursors.left.isDown)
+        {
+            this.player.setVelocityX(-160);
+
+            this.player.anims.play('left-walk', true);
+            }
+        else if (cursors.right.isDown)
+        {
+            this.player.setVelocityX(160);
+
+            this.player.anims.play('right-walk', true);
+        }
+        else
+        {
+            this.player.setVelocityX(0);
+
+            if (facingLeft == true){
+            this.player.anims.play('right-idle',true);
+            }
+            else if (facingRight == true){
+            this.player.anims.play('left-idle',true);
+            };
+            
+        };
+
+        if (cursors.up.isDown && this.player.body.touching.down)
+        {
+            this.player.setVelocityY(-600);
+        };
+        if (velocity < 0){
+            facingRight = true;
+            facingLeft = false;
+        }
+        else if(velocity > 0){
+            facingLeft = true;
+            facingRight = false;
+        };
+        if (upVel < 0){
+            if (facingRight == true){
+            this.player.anims.play('left-jump',true)}
+            else if (facingLeft == true){
+                this.player.anims.play('right-jump',true)
+            };
+        }else if(upVel > 0){
+            if (facingRight == true){
+            this.player.anims.play('left-fall',true)}
+            else if (facingLeft == true){
+                this.player.anims.play('right-fall',true)
+            };
+        };
+        //player movement end
+        //platform movement start
+        if (keyW.isDown){
+            this.P2.setVelocityY(-160); 
+            this.P2.setVelocityX(0);
+            this.P2.anims.play('platform-up',true)
+            
+        }
+        else if (keyS.isDown){
+            this.P2.setVelocityY(160); 
+            this.P2.setVelocityX(0);
+            this.P2.anims.play('platform-down',true)
+        }  
+        else if (keyA.isDown){
+            this.P2.setVelocityX(-160); 
+            this.P2.setVelocityY(0);
+            this.P2.anims.play('platform-left',true)
+        }   
+        else if (keyD.isDown){
+            this.P2.setVelocityX(160); 
+            this.P2.setVelocityY(0);
+            this.P2.anims.play('platform-right',true)
+        } 
+        else{
+            this.P2.setVelocityX(0); 
+            this.P2.setVelocityY(0);
+            this.P2.anims.play('platform-idle',true)
+        }
+        if(collision == false){
+            this.P2.setImmovable(false);
+            
+
+        }
+        else{
+            this.P2.setImmovable(true);
+            this.P2.setVelocityX(0); 
+            this.P2.setVelocityY(0);
+            collision = false;
+        };
+        if (this.player.body.touching.down){
+            console.log("on ground")
+        };
+    };
+function collision(){
+    console.log("collide");
+    collision = true
+}
+</script>
+
+</body>
+</html>
