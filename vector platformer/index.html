@@ -15,12 +15,14 @@
 <script type="text/javascript">
     var config = {
     type: Phaser.AUTO,
-    width: 6720,
-    height: 1440,
+    //width: 4480,
+    //height: 960,
+    width: 800,
+    height: 800,
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
+            gravity: { y: 75 },
             debug: true
         }
     },
@@ -49,27 +51,27 @@
     function create ()
     {//create assets within the game
         this.skyMap = this.make.tilemap({key: 'sky'});
-        this.tileset = this.skyMap.addTilesetImage('skytileset','tiles');
+        this.tileset = this.skyMap.addTilesetImage('skytileset','tiles',16,16);
         this.background = this.skyMap.createLayer('background', this.tileset,);           
         this.shrooms = this.skyMap.createLayer('mushrooms', this.tileset,);
         this.shrooms.setCollisionByExclusion([-1]);
-        this.background.setScale(3);
-        this.shrooms.setScale(3);
+        // this.background.setScale(4);
+        // this.shrooms.setScale(4);
 
 
         
-        Text = this.add.text(16, 16, 0, { fontSize: '32px', fill: '#000' });
-        upText = this.add.text(16, 40, 0, { fontSize: '32px', fill: '#000' });
+        Text = this.add.text(16, 16, 0, { fontSize: '16px', fill: '#000' });
+        upText = this.add.text(16, 40, 0, { fontSize: '16px', fill: '#000' });
 
         
         
 //add the player model and add physics
-        this.player = this.physics.add.sprite(200,200,"player");
-        this.player.setScale(3);
+        this.player = this.physics.add.sprite(50,50,"player");
+        //this.player.setScale(4);
         this.player.setCollideWorldBounds(true);
         this.player.body.setGravityY(300)
-        this.P2 = this.physics.add.sprite(100,100,"P2");
-        this.P2.setScale(3);
+        this.P2 = this.physics.add.sprite(25,25,"P2");
+       // this.P2.setScale(4);
         this.P2.body.setAllowGravity(false);
         this.P2.setCollideWorldBounds(true);
         this.physics.add.collider(this.player, this.shrooms,mushcol,null,this);
@@ -168,14 +170,21 @@
             frameRate: 0,
             repeat: -1
         })
+
+        //camera
+        this.cameras.main.startFollow(this.player);
+        this.cameras.main.setBounds(0, 0, 1120, 240);
         /*player*/facingLeft = false;
         /*player*/facingRight = false;
-        /*player*/canJump = false
+        /*player*/canJump = false;
         colliding = true;
     };
     
     function update(){
-        Text.setPosition(this.player.x-50,this.player.y-50)
+        // this.cameras.main.centerOn(this.player.x, this.player.y);
+        this.cameras.main.zoom = 4
+    
+        
         velocity=this.player.body.velocity.x;
         Text.setText(velocity);
         upVel = this.player.body.velocity.y;
@@ -196,13 +205,13 @@
 //player movement start
         if (cursors.left.isDown)
         {
-            this.player.setVelocityX(-160);
+            this.player.setVelocityX(-40);
 
             this.player.anims.play('left-walk', true);
             }
         else if (cursors.right.isDown)
         {
-            this.player.setVelocityX(160);
+            this.player.setVelocityX(40);
 
             this.player.anims.play('right-walk', true);
         }
@@ -221,7 +230,7 @@
 
         if (cursors.up.isDown && canJump == true)
         {
-            this.player.setVelocityY(-600);
+            this.player.setVelocityY(-250);
             canJump = false
         };
         if (velocity < 0){
@@ -248,23 +257,23 @@
         //player movement end
         //platform movement start
         if (keyW.isDown){
-            this.P2.setVelocityY(-160); 
+            this.P2.setVelocityY(-40); 
             this.P2.setVelocityX(0);
             this.P2.anims.play('platform-up',true)
             
         }
         else if (keyS.isDown){
-            this.P2.setVelocityY(160); 
+            this.P2.setVelocityY(40); 
             this.P2.setVelocityX(0);
             this.P2.anims.play('platform-down',true)
         }  
         else if (keyA.isDown){
-            this.P2.setVelocityX(-160); 
+            this.P2.setVelocityX(-40); 
             this.P2.setVelocityY(0);
             this.P2.anims.play('platform-left',true)
         }   
         else if (keyD.isDown){
-            this.P2.setVelocityX(160); 
+            this.P2.setVelocityX(40); 
             this.P2.setVelocityY(0);
             this.P2.anims.play('platform-right',true)
         } 
