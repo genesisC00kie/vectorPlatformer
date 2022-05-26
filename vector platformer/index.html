@@ -36,7 +36,6 @@
     var Text;
     function preload ()
     {//load the assets
-        this.load.image('background', 'assets/sky.png');
         this.load.image('tiles', 'assets/skyTileset.png');
         this.load.tilemapTiledJSON('sky', 'assets/skyTilemap.json');
         this.load.spritesheet('player', 
@@ -73,7 +72,7 @@
         this.P2.setScale(3);
         this.P2.body.setAllowGravity(false);
         this.P2.setCollideWorldBounds(true);
-        this.physics.add.collider(this.player, this.shrooms);
+        this.physics.add.collider(this.player, this.shrooms,mushcol,null,this);
         
         
 // animations
@@ -171,6 +170,7 @@
         })
         /*player*/facingLeft = false;
         /*player*/facingRight = false;
+        /*player*/canJump = false
         colliding = true;
     };
     
@@ -219,9 +219,10 @@
             
         };
 
-        if (cursors.up.isDown && this.player.body.touching.down)
+        if (cursors.up.isDown && canJump == true)
         {
             this.player.setVelocityY(-600);
+            canJump = false
         };
         if (velocity < 0){
             facingRight = true;
@@ -285,11 +286,16 @@
         };
         if (this.player.body.touching.down){
             console.log("on ground")
+            canJump = true
         };
     };
 function collision(){
     console.log("collide");
     collision = true
+}
+function mushcol(){
+    console.log("on mushroom");
+    canJump = true
 }
 </script>
 
