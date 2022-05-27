@@ -54,7 +54,10 @@
         this.tileset = this.skyMap.addTilesetImage('skytileset','tiles',16,16);
         this.background = this.skyMap.createLayer('background', this.tileset,);           
         this.shrooms = this.skyMap.createLayer('mushrooms', this.tileset,);
+        this.playerBound = this.skyMap.createLayer('playerBound', this.tileset,);
         this.shrooms.setCollisionByExclusion([-1]);
+        this.playerBound.setCollisionByExclusion([-1]);
+        
         // this.background.setScale(4);
         // this.shrooms.setScale(4);
 
@@ -68,13 +71,18 @@
 //add the player model and add physics
         this.player = this.physics.add.sprite(50,50,"player");
         //this.player.setScale(4);
-        this.player.setCollideWorldBounds(true);
+        //this.player.setCollideWorldBounds(true);
         this.player.body.setGravityY(300)
+
+
         this.P2 = this.physics.add.sprite(25,25,"P2");
        // this.P2.setScale(4);
         this.P2.body.setAllowGravity(false);
         this.P2.setCollideWorldBounds(true);
+
+
         this.physics.add.collider(this.player, this.shrooms,mushcol,null,this);
+        this.physics.add.collider(this.player, this.playerBound);
         
         
 // animations
@@ -170,6 +178,13 @@
             frameRate: 0,
             repeat: -1
         })
+        this.tweens.add({
+        targets: this.player,
+        y: 700,
+        duration: 3000,
+        ease: 'Power2',
+        completeDelay: 3000
+    });
 
         //camera
         this.cameras.main.startFollow(this.player);
